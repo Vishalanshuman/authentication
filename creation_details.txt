@@ -1,0 +1,51 @@
+I created full responsive authentication system using Html, Bootstrap in frontend and using django as backend of the website.
+
+First i geve the command in new terminal to start project 'django-admin startproject authentication' after that i goto the project file giving command 'cd authentication'.
+After that i create new app giving command 'py manage.ph startapp enroll'.
+Then i go to the authentication setting and pass 'enroll' into installed app.
+Then i make a new file in enroll 'forms.py' and import User from 'django.contrib.auth.models', and also import usercreationform from 'django.contrib.auth.forms'.
+After that i make a class and pass the usercreationform into that and make a Meta class and pass the model and fields.
+In model we have to pass User and fields we have to pass the fields which we want ot take from user from front end.
+And after that i have to create views where we create function which used to specify how forms works.
+I pass the class which we created in forms for usercreation, First we impor the class from the forms.py and pass into
+the function signupPage which we are making a function for develop for front-end.
+In signupPage function i pass the createUser which i created in forms.py and store it into a variable form and pass it into the context and also pass into the rendered.
+Afeter that we check if the request.method is Post then Pass CteateUser(rquest.Post) and store it into the user variable.
+and check if user is valid then we save the user.
+
+and pass the form into the front end.
+and pass csrf token into the form and specify the method as "POST".
+and make a submit button for submit the form.
+Now we create a model in models.py named profile and pass a user which is onetoone field for grab the user details and make the relatin between user and profile.
+pass the gender charfield and provide the choices male and female which provide function to user to choose between them.
+Then goto the forms.py and make a new class ProfileCreation(forms.Modelform).
+and pass the model and fields and a exclude whic is equal to 'user', .
+After That we came into the signupPage function and update it passing the class name ProfileCreation and store it into profile_form.
+pass user in profile if user.is_valid and pass the profile_form  commit=false
+impor message to get message in base.html.
+pass profile user  as saved user and redirect the page loginpage afer successfully signup.
+and pass the url into the enroll.urls. makeing path('signup', views.signupPage, name='signupPage') we pass the singupPge which is specify as name into the base nav into anker tag url 
+and and a button into the a tag after clicking on the button we jump on the rendered html whic is specified into the signupPge function into views.py.
+
+After that we create a login function in views.py and in front end we use the form and pass the input name as 'username' and password input pass the name 'password' and in forms csrf token is mandatory.
+and come into the function and using get method pass the username = reqeust.POST.get('username') and password= request.POST('password').
+and import the authenticate and login and autenticate the username and password.
+Now we got to the ursl and make a url path as path('login/'.views.loginPage, name="logonPage").
+And pass it into the button login in base.html.
+
+Afteer that we make a logout function and pass it into logout button in bast.html.
+first we impor logout and make a function as logoutpage and pass request logout()
+and make url path name from path pass into the logout button.
+
+
+Now we are going to create function for update userdetail, for that we user the instance which is present into the userprofile.
+and check if the request is POST then take both forms user and profile and pass instance as request.user and for profile pass request.user.profile
+and check if both forms are valid then save both.
+
+
+
+
+And i user the postgresql into the backend 
+with username postgres and password 4321 and local host, 127.0.0.1
+we can see the detals and profiele into the schema table into the database named authentication.
+
