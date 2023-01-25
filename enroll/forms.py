@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User 
 from django.contrib.auth.forms import UserCreationForm  
-from .models import Profile
+from .models import Profile, Employee_doc
 from django import forms
 
 
@@ -47,4 +47,11 @@ class ProfileCreation(forms.ModelForm):
         widget=forms.RadioSelect,
         choices=GENDER_CHOICES, 
     )
+
+class Adhar_card_form(forms.ModelForm):
+    class Meta:
+        model = Employee_doc
+        fields = '__all__'
+        exclude = 'employee',
+
 
