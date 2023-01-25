@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 django
 django-countries
 django-countries[pyuca]
 pillow
+=======
+django
+django-countries
+django-countries[pyuca]
+>>>>>>> 5717e685fa6f0b220e418f7792e1a34bc22dee00
