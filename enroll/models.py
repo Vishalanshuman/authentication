@@ -25,6 +25,16 @@ class Employee_doc(models.Model):
 
     def __str__(self):
         return self.employee.username
-    
+
+class Employment_details(models.Model):
+    employee  = models.ForeignKey('auth.user',on_delete=models.CASCADE)
+    company = models.CharField(max_length=300)
+    certificate_file = models.ImageField(upload_to='employment_certificates', null=True)
+    join_date = models.DateField(null=False)
+    last_working_day = models.DateField(null=False)
+
+    def __str__(self):
+        return "%s %s"%(self.employee.username, self.company)
+
 
 

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User 
 from django.contrib.auth.forms import UserCreationForm  
-from .models import Profile, Employee_doc
+from .models import Profile, Employee_doc, Employment_details
 from django import forms
 
 
@@ -54,4 +54,22 @@ class Adhar_card_form(forms.ModelForm):
         fields = '__all__'
         exclude = 'employee',
 
+class Employment_form(forms.ModelForm):
+    class Meta:
+        model = Employment_details
+        fields = ['employee', 'company','certificate_file','join_date','last_working_day']
+        exclude = 'employee',
 
+
+
+    company= forms.CharField(max_length=100,
+                           widget= forms.TextInput
+                           (attrs={'placeholder':'Company Name', 'class':'form-control'}))
+
+    join_date= forms.CharField(max_length=100,
+                           widget= forms.EmailInput
+                           (attrs={'placeholder':'YYYY-MM-DD', 'class':'form-control'}))
+    last_working_day = forms.CharField(
+        max_length=100,
+        widget=forms.PasswordInput(attrs={'placeholder':'YYYY-MM-DD', 'class':'form-control'})
+    )

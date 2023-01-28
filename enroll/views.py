@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from .forms import CreateUser, ProfileCreation,Adhar_card_form
+from .forms import CreateUser, ProfileCreation,Adhar_card_form,Employment_form
 from django.contrib import messages
-
+from .models import Employment_details
 from django.contrib.auth import authenticate, login, logout
 
 
@@ -111,6 +111,52 @@ def update_adhar(request):
     else:
         return redirect("loginpage")
 
+def add_employement(request):
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            emp_form = Employment_form(request.POST, request.FILES)
+            if emp_form.is_valid():
+                form=emp_form.save(commit=False)
+                form.employee=request.user
+                form.save()
+                messages.success(request,"Employment details sumitted successfully")
+                return redirect("/")
+            else:
+                messages.info(request,str(emp_form.errors))
+        form = Employment_form
+        context = {'form':form}
+        return render(request,'employment.html', context)
+    else:
+        return redirect("loginpage")
 
+def employee_list(request):
+    if request.user.is_authenticated:
+        emps = Employment_details.objects.filter(employee=request.user)
+        context={'emps':emps}
+        return render(request, 'employmentList.html', context)
+    else:
+        return redirect("loginpage")
 
+def Update_employment(request,id):
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            form = Employment_form(request.POST, request.FILES, instance=Employment_details.objects.get(id=id))
+            if form.is_valid():
+                _form=form.save(commit=False)
+                _form.employee = request.user
+                _form.save()
+                messages.success(request,"Details are Updated successfully..")
+                return redirect("/")
+            else:
+                messages.info(request, str(form.errors))
+        else:
+            form = Employment_form(instance=Employment_details.objects.get(id=id))
+            context = {'form':form}
+            return render(request,'employment.html', context)
+    else:
+        return redirect("loginpage")
 
+def delete_employment(request,id):
+    empnts = Employment_details.objects.get(id=id)
+    empnts.delete()
+    return redirect('employment_list')
