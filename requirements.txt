@@ -3,4 +3,7 @@ django
 django-countries
 django-countries[pyuca]
 pillow
+<<<<<<< HEAD
 
+=======
+>>>>>>> 76e1c65c783bee48aebad6b85c72c55133b41859
