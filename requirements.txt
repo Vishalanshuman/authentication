@@ -1,5 +1,0 @@
-
-django
-django-countries
-django-countries[pyuca]
-pillow
