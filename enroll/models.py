@@ -18,7 +18,7 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
     
-class Employee_doc(models.Model):
+class Adhar_card(models.Model):
     employee = models.OneToOneField(User,on_delete=models.CASCADE)
     adhar_card = models.CharField(max_length=12)
     adhar_file = models.ImageField(upload_to="adhar_card_file", null=False)

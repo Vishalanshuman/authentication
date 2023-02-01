@@ -1,8 +1,12 @@
-from django.shortcuts import render, redirect
+from django.forms import modelformset_factory, inlineformset_factory
+from django.shortcuts import render, redirect, get_list_or_404
 from .forms import CreateUser, ProfileCreation,Adhar_card_form,Employment_form
 from django.contrib import messages
 from .models import Employment_details
 from django.contrib.auth import authenticate, login, logout
+from django.db import transaction , IntegrityError
+from .models import Adhar_card
+from django.contrib.auth.models import User
 
 
 # Create your views here.
@@ -61,7 +65,7 @@ def loginPage(request):
         if user is not None:
             login(request,user)
             messages.success(request, 'You are successfully loggedin....')
-            return redirect('adhar')
+            return redirect('employmentPage')
         else:
           messages.info(request, "Username or password is incorrect..")
     context = {}
@@ -72,91 +76,53 @@ def logoutPage(request):
     messages.success(request, "You are successfully Loggedout....")
     return redirect('/')
 
-
-def Adhar_detail(request):
-    if request.user.is_authenticated:
-        if request.method=="POST":
-            form = Adhar_card_form(request.POST, request.FILES)
-            if form.is_valid():
-                adhar_form=form.save(commit=False)
-                adhar_form.employee = request.user
-                adhar_form.save()
-                messages.success(request,"Details are submitted successfully..")
-                return redirect("/")
-            else:
-                messages.info(request, str(form.errors))
-        else:
-            form = Adhar_card_form()
-            context = {'form':form}
-            return render(request,'adhar_detail.html', context)
-    else:
-        return redirect("loginpage")
-
-def update_adhar(request):
-    if request.user.is_authenticated:
-        if request.method=="POST":
-            form = Adhar_card_form(request.POST, request.FILES, instance=request.user.employee_doc)
-            if form.is_valid():
-                adhar_form=form.save(commit=False)
-                adhar_form.employee = request.user
-                adhar_form.save()
-                messages.success(request,"Details are submitted successfully..")
-                return redirect("/")
-            else:
-                messages.info(request, str(form.errors))
-        else:
-            form = Adhar_card_form(instance=request.user.employee_doc)
-            context = {'form':form}
-            return render(request,'update_adhar.html', context)
-    else:
-        return redirect("loginpage")
-
 def add_employement(request):
     if request.user.is_authenticated:
+
+        employmentFormset = modelformset_factory(Employment_details,form=Employment_form, extra=5)
+        formset = employmentFormset(request.POST or None, request.FILES or None, queryset=Employment_details.objects.none())
+        form = Adhar_card_form(request.POST or None,request.FILES or None)
         if request.method=="POST":
-            emp_form = Employment_form(request.POST, request.FILES)
-            if emp_form.is_valid():
-                form=emp_form.save(commit=False)
-                form.employee=request.user
-                form.save()
-                messages.success(request,"Employment details sumitted successfully")
-                return redirect("/")
-            else:
-                messages.info(request,str(emp_form.errors))
-        form = Employment_form
-        context = {'form':form}
-        return render(request,'employment.html', context)
-    else:
-        return redirect("loginpage")
+            if form.is_valid() and formset.is_valid():
+                    adhar = form.save(commit=False)
+                    adhar.employee = request.user
+                    adhar.save()
+                    
+                    formset1=formset.save(commit=False)
+                    for fields in formset1:
+                        fields.employee=request.user
+                        fields.save()
+                    messages.success(request, 'Details submitted successfully')
+                    return redirect('/')
+            messages.info(request,form.errors, formset.errors)
+        context = {'form':form,'formset':formset}
+        return render(request, 'employment.html',context)
+    return redirect('loginpage')
 
-def employee_list(request):
+def Update_employment(request):
     if request.user.is_authenticated:
-        emps = Employment_details.objects.filter(employee=request.user)
-        context={'emps':emps}
-        return render(request, 'employmentList.html', context)
-    else:
-        return redirect("loginpage")
-
-def Update_employment(request,id):
-    if request.user.is_authenticated:
+        employmentFormset = modelformset_factory(model= Employment_details, form=Employment_form, extra=0)
+        formset = employmentFormset(request.POST or None, request.FILES or None, queryset=Employment_details.objects.filter(employee=request.user))
+        form = Adhar_card_form(request.POST or None,request.FILES or None, instance=request.user.adhar_card or None)
         if request.method=="POST":
-            form = Employment_form(request.POST, request.FILES, instance=Employment_details.objects.get(id=id))
-            if form.is_valid():
-                _form=form.save(commit=False)
-                _form.employee = request.user
-                _form.save()
-                messages.success(request,"Details are Updated successfully..")
-                return redirect("/")
-            else:
-                messages.info(request, str(form.errors))
-        else:
-            form = Employment_form(instance=Employment_details.objects.get(id=id))
-            context = {'form':form}
-            return render(request,'employment.html', context)
+            if form.is_valid() and formset.is_valid():
+                    adhar = form.save(commit=False)
+                    adhar.employee = request.user
+                    adhar.save()
+                    formset1=formset.save(commit=False)
+                    for fields in formset1:
+                        fields.employee = request.user
+                        fields.save()
+                    messages.success(request, 'Details submitted successfully')
+                    return redirect('/')
+            messages.info(request,form.errors, formset.errors)
+        context = {'form':form,'formset':formset}
+        return render(request, 'Update_employment.html',context)
     else:
         return redirect("loginpage")
 
-def delete_employment(request,id):
-    empnts = Employment_details.objects.get(id=id)
-    empnts.delete()
-    return redirect('employment_list')
+def delete_employment(request, pk):
+    object = get_list_or_404(Employment_details, pk=pk)
+    object.delete()
+    messages(request, 'Employment Record Deleted Successfully.')
+    return redirect('updateEmployment')

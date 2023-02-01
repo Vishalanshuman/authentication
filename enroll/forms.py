@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User 
 from django.contrib.auth.forms import UserCreationForm  
-from .models import Profile, Employee_doc, Employment_details
+from .models import Profile, Adhar_card, Employment_details
 from django import forms
+from django.forms import inlineformset_factory
 
 
 class CreateUser(UserCreationForm):
@@ -50,26 +51,27 @@ class ProfileCreation(forms.ModelForm):
 
 class Adhar_card_form(forms.ModelForm):
     class Meta:
-        model = Employee_doc
+        model = Adhar_card
         fields = '__all__'
         exclude = 'employee',
 
+class DateInput(forms.DateInput):
+    input_type='date'
 class Employment_form(forms.ModelForm):
     class Meta:
         model = Employment_details
         fields = ['employee', 'company','certificate_file','join_date','last_working_day']
         exclude = 'employee',
+        widgets={'last_working_day': DateInput(),'join_date': DateInput()}
 
 
 
-    company= forms.CharField(max_length=100,
-                           widget= forms.TextInput
-                           (attrs={'placeholder':'Company Name', 'class':'form-control'}))
 
-    join_date= forms.CharField(max_length=100,
-                           widget= forms.EmailInput
-                           (attrs={'placeholder':'YYYY-MM-DD', 'class':'form-control'}))
-    last_working_day = forms.CharField(
-        max_length=100,
-        widget=forms.PasswordInput(attrs={'placeholder':'YYYY-MM-DD', 'class':'form-control'})
-    )
+
+
+
+employmentFormSet = inlineformset_factory(
+    User, Employment_details, form=Employment_form,
+    extra=1, can_delete=True, can_delete_extra=True
+)
+
