@@ -1,12 +1,9 @@
-from django.forms import modelformset_factory, inlineformset_factory
+from django.forms import modelformset_factory
 from django.shortcuts import render, redirect, get_list_or_404
-from .forms import CreateUser, ProfileCreation,Adhar_card_form,Employment_form
+from .forms import CreateUser, ProfileCreation,Adhar_card_form,Employment_form, Pancard_form, Passport_form
 from django.contrib import messages
 from .models import Employment_details
 from django.contrib.auth import authenticate, login, logout
-from django.db import transaction , IntegrityError
-from .models import Adhar_card
-from django.contrib.auth.models import User
 
 
 # Create your views here.
@@ -36,21 +33,17 @@ def signupPage(request):
     return render(request, 'signup.html',context)
 
 def updateProfile(request):
- 
     if request.method =="POST":
         user = CreateUser(request.POST, instance = request.user)
         profile_form  = ProfileCreation(request.POST, instance=request.user.profile)
         if  user.is_valid() and profile_form.is_valid():
             user = user.save()
             profile = profile_form.save(commit=False)
-
             profile.user = user
             profile.save()
-
             messages.success(request," Successfully Registered ")
             return redirect('loginpage')
         messages.info(request,user.errors, profile_form.errors)
-
     form = CreateUser(instance = request.user)
     profile_form = ProfileCreation(instance=request.user.profile)
     context = {'form':form, 'profile_form':profile_form}
@@ -79,23 +72,32 @@ def logoutPage(request):
 def add_employement(request):
     if request.user.is_authenticated:
 
-        employmentFormset = modelformset_factory(Employment_details,form=Employment_form, extra=5)
+        employmentFormset = modelformset_factory(Employment_details,form=Employment_form, extra=10)
         formset = employmentFormset(request.POST or None, request.FILES or None, queryset=Employment_details.objects.none())
+
         form = Adhar_card_form(request.POST or None,request.FILES or None)
+        pan_form = Pancard_form(request.POST or None,request.FILES or None)
+        pass_form = Passport_form(request.POST or None, request.FILES or None)
         if request.method=="POST":
-            if form.is_valid() and formset.is_valid():
+            if form.is_valid() and formset.is_valid() and pan_form.is_valid() and pass_form.is_valid():
                     adhar = form.save(commit=False)
+                    pan = pan_form.save(commit=False)
+                    passport = pass_form.save(commit=False)
                     adhar.employee = request.user
+                    pan.employee = request.user
+                    passport.employee = request.user
                     adhar.save()
-                    
+                    pan.save()
+                    passport.save()
+
                     formset1=formset.save(commit=False)
                     for fields in formset1:
                         fields.employee=request.user
                         fields.save()
                     messages.success(request, 'Details submitted successfully')
                     return redirect('/')
-            messages.info(request,form.errors, formset.errors)
-        context = {'form':form,'formset':formset}
+            messages.info(request,form.errors, formset.errors, pan_form.errors, pass_form)
+        context = {'form':form,'formset':formset,'pan_form':pan_form, 'pass_form':pass_form}
         return render(request, 'employment.html',context)
     return redirect('loginpage')
 
@@ -104,20 +106,28 @@ def Update_employment(request):
         employmentFormset = modelformset_factory(model= Employment_details, form=Employment_form, extra=0)
         formset = employmentFormset(request.POST or None, request.FILES or None, queryset=Employment_details.objects.filter(employee=request.user))
         form = Adhar_card_form(request.POST or None,request.FILES or None, instance=request.user.adhar_card or None)
+        pan_form = Pancard_form(request.POST or None,request.FILES or None, instance=request.user.pan_card or None)
+        pass_form = Passport_form(request.POST or None, request.FILES or None, instance=request.user.passport)
         if request.method=="POST":
-            if form.is_valid() and formset.is_valid():
+            if form.is_valid() and formset.is_valid() and pan_form.is_valid() and pass_form.is_valid():
                     adhar = form.save(commit=False)
+                    pan = pan_form.save(commit=False)
+                    passport = pass_form.save(commit=False)
                     adhar.employee = request.user
+                    pan.employee = request.user
+                    passport.employee = request.user
                     adhar.save()
-                    formset1=formset.save(commit=False)
+                    pan.save()
+                    passport.save()
+                    formset1 = formset.save(commit=False)
                     for fields in formset1:
                         fields.employee = request.user
                         fields.save()
                     messages.success(request, 'Details submitted successfully')
                     return redirect('/')
             messages.info(request,form.errors, formset.errors)
-        context = {'form':form,'formset':formset}
-        return render(request, 'Update_employment.html',context)
+        context = {'form':form,'formset':formset,'pan_form':pan_form, 'pass_form':pass_form}
+        return render(request, 'update_employment.html',context)
     else:
         return redirect("loginpage")
 

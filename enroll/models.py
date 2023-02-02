@@ -22,7 +22,6 @@ class Adhar_card(models.Model):
     employee = models.OneToOneField(User,on_delete=models.CASCADE)
     adhar_card = models.CharField(max_length=12)
     adhar_file = models.ImageField(upload_to="adhar_card_file", null=False)
-
     def __str__(self):
         return self.employee.username
 
@@ -35,6 +34,23 @@ class Employment_details(models.Model):
 
     def __str__(self):
         return "%s %s"%(self.employee.username, self.company)
+
+class Pan_card(models.Model):
+    employee = models.OneToOneField('auth.user', on_delete=models.CASCADE)
+    pan_number = models.CharField(max_length=14, null=False)
+    pan_front_image = models.ImageField(upload_to='pand_card', null=False)
+    pan_back_image = models.ImageField(upload_to='pand_card', null=False)
+
+    def __str__(self):
+        return self.employee.username
+class Passport(models.Model):
+    employee = models.OneToOneField('auth.user', on_delete=models.CASCADE)
+    passport_number = models.CharField(max_length=14, null=False)
+    passport_image = models.ImageField(upload_to='Passport', null=False)
+
+    def __str__(self):
+        return self.employee.username
+
 
 
 

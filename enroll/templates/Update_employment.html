@@ -4,58 +4,70 @@
     .hidden{
         display: none;
     }
+    .sub{
+        float: right;
+        margin-right:30px;
+    }
 </style>
 {% endblock style %}
 {% block content %}
-<div class="container h-100 card shadow mt-4 ">
+<div class="container h-100 card shadow mt-4 p-4">
     <form action="" method="POST"  enctype="multipart/form-data">
         {% csrf_token %}
 
         <div class="container card border m-2 card shadow p-4">
             <h3 class='Text-center'>{{request.user.first_name}} {{request.user.last_name}} Details</h3><hr>
             <div class="row mt-4">
-                <h4 class="text-center bold">Adhar Card</h4>
+                <h3 class="text-center bold">Adhar Card Details</h3>
                 <hr>
-                <div class="col-4 text-center"><h6>Adhar Card Number</h6><span class='mt-0'>{{form.adhar_card}}</span></div>
-                <div class="col-4 text-center"><h6>Upload Adhar card File</h6><span>{{form.adhar_file}}</span></div>
+                <div class="col-4 text-center"><h5>Adhar Card Number:</h5><span class='mt-0'>{{form.adhar_card}}</span></div>
+                <div class="col-4 text-center"><h5>Upload Adhar card File:</h5><span>{{form.adhar_file}}</span></div>
                 {% comment %} <div class="col-4 text-center"><h6>Last Working Day</h6><span>{{form.last_working_day}}</span></div> {% endcomment %}
             </div><hr>
+            <div class="row mt-4">
+                <h3 class="text-center bold">Pan Card Details</h3>
+                <hr>
+                <div class="col-4 text-center"><h5>Pancard Number:</h5><span class='mt-0'>{{pan_form.pan_number}}</span></div>
+                <div class="col-4 text-center"><h5>Upload Front Side of Pan Card:</h5><span>{{pan_form.pan_front_image}}</span></div>
+                <div class="col-4 text-center"><h6>Upload Back Side of Pan Card:</h6><span>{{pan_form.pan_back_image}}</span></div>
+            </div><hr>
+            <div class="row mt-4">
+                <h3 class="text-center bold">Passport Details</h3>
+                <hr>
+                <div class="col-4 text-center"><h5>Passport Number:</h5><span class='mt-0'>{{pass_form.passport_number}}</span></div>
+                <div class="col-4 text-center"><h5>Passport Image:</h5><span>{{pass_form.passport_image}}</span></div>
+                {% comment %} <div class="col-4 text-center"><h6>Last Working Day</h6><span>{{pass_form.adhar_card}}</span></div> {% endcomment %}
+            </div><hr>
             <h3 class="text-center">Employment Records</h3><hr> 
-            {% for fields in formset %}
+            {%  for fields in formset %}
             {{ formset.management_form }}
-            <div id="firstEmp ">
-                <div class="row mt-2 employeeDiv m-5" >
-                    <div class="col-4"><span class='mb-3'>Company Name:</span>{{fields.company}}</div>
-                    <div class="col-4"><span class='mb-1'>Company Join Date:</span><br>{{fields.join_date}}</div>
-                    <div class="col-4"><span class='mb-1'>Last Working Day:</span><br>{{fields.last_working_day}}</div>
-                    <div class="col-4"><span class='mb-1'>Upload Certificate:</span>{{fields.certificate_file}}</div>
-                    <div class="col-4"></div>
-                    <div class="col-4"><a href="{% url 'deleteEmployment' fields.id %}" class='ms-10'> <button class="btn btn-danger">Delete</button> </a></div>
+            <div id="firstEmp">
+                <div class="row mt-2 employeeDiv" >
+                    <div class="col-3"><h5 class='bold'>Company Name:</h5>{{fields.company}}</div>
+                    <div class="col-3"><h5 class='bold'>Company Join Date:</h5>{{fields.join_date}}</div>
+                    <div class="col-3"><h5 class='bold'>Last Working Day:</h5>{{fields.last_working_day}}</div>
+                    <div class="col-3"><h5 class='bold'>Upload Certificate:</h5>{{fields.certificate_file}}</div>
+
                 </div>
             </div>
+            <div id="moreEmployment"></div>
             {% endfor %}
+
             <div class="form-group row ">
                 <label for="" class="col-md-4"></label>
                 <div class="col-md-8 mt-3">
-                    <input type="submit" value="Submit" class="btn btn-primary">
+                    <button type='button' onclick="addEmployment()" class="btn btn-info">Add More</button>
+                    <button type='button' onclick="removeEmployment()" class="btn btn-danger ">Remove</button>
                 </div> 
             </div>
         </div>
+        <input type="submit" value="Submit" class="btn btn-primary sub" style={float: right}>
+
     </form>
 </div>
 {% endblock content %}
 
 {% block script %}
-<script>
-    let a=1
-    $('.employeeDiv').slice(1,5).addClass('hidden')
-    function addEmployment(){
-        $('#firstEmp .employeeDiv').eq(a).removeClass('hidden');
-        a++;
-    }
-    function removeEmployment(){
-        $('#firstEmp .employeeDiv').eq(a).addClass('hidden');
-        a--;
-    };
+<scrip>
 </script>
 {% endblock script %}

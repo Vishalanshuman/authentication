@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User 
 from django.contrib.auth.forms import UserCreationForm  
-from .models import Profile, Adhar_card, Employment_details
+from .models import Profile, Adhar_card, Employment_details, Pan_card, Passport
 from django import forms
 from django.forms import inlineformset_factory
 
@@ -54,6 +54,14 @@ class Adhar_card_form(forms.ModelForm):
         model = Adhar_card
         fields = '__all__'
         exclude = 'employee',
+    def clean_adhar_card(self, *args, **kwargs):
+        data = self.cleaned_data.get("adhar_card")
+        if len(data)!=12:
+            raise forms.ValidationError('Adhar card numner must contain 12 numbers')
+        return data
+    
+
+
 
 class DateInput(forms.DateInput):
     input_type='date'
@@ -65,13 +73,15 @@ class Employment_form(forms.ModelForm):
         widgets={'last_working_day': DateInput(),'join_date': DateInput()}
 
 
+class Pancard_form(forms.ModelForm):
+    class Meta:
+        model = Pan_card
+        fields = '__all__'
+        exclude = 'employee',
 
-
-
-
-
-employmentFormSet = inlineformset_factory(
-    User, Employment_details, form=Employment_form,
-    extra=1, can_delete=True, can_delete_extra=True
-)
+class Passport_form(forms.ModelForm):
+    class Meta:
+        model = Passport
+        fields = '__all__'
+        exclude = 'employee',
 
