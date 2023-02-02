@@ -21,7 +21,7 @@
                 {% comment %} <div class="col-4 text-center"><h6>Last Working Day</h6><span>{{form.last_working_day}}</span></div> {% endcomment %}
             </div><hr>
             <h3 class="text-center">Employment Records</h3><hr> 
-            {% for fields in formset %}
+            {%  for fields in formset %}
             {{ formset.management_form }}
             <div id="firstEmp">
                 <div class="row mt-2 employeeDiv" >
